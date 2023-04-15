@@ -5,11 +5,14 @@ using UnityEngine;
 public class ShipDetector : MonoBehaviour
 {
     private Ship ship;
+    private SphereCollider col;
 
     // Start is called before the first frame update
     void Start()
     {
         ship = transform.parent.GetComponent<Ship>();
+        col = GetComponent<SphereCollider>();
+        col.radius = ship.detectionRange;
     }
 
     // Update is called once per frame

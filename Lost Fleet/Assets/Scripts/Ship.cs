@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class Ship : MonoBehaviour
 {
+    public Transform frontSail;
     int health = 2;
+    public float detectionRange = 10f;
+
     static HashSet<Ship> nearbyShips = new HashSet<Ship>();
     static HashSet<Ship> activeShips = new HashSet<Ship>();
     //TODO: Add detector
@@ -19,8 +22,8 @@ public class Ship : MonoBehaviour
     public int directCrew;
 
     private Rigidbody rb;
-    private SteeringOutput currentSteering = new();
-    private SteeringOutput targetSteering = new();
+    public SteeringOutput currentSteering = new();
+    public SteeringOutput targetSteering = new();
 
     // Start is called before the first frame update
     void Start()
@@ -55,19 +58,23 @@ public class Ship : MonoBehaviour
         combined += Steering.Wind(this, windCrew);
         combined += Steering.Oars(this, oarCrew);
         combined += Steering.Separation(this, separationCrew);
-        combined += Steering.Avoidance(this, avoidCrew);
         combined += Steering.CohesionLocal(this, cohesionLocalCrew);
         combined += Steering.CohesionGlobal(this, cohesionGlobalCrew);
         combined += Steering.Alignment(this, alignmentCrew);
         combined += Steering.Direct(this, directCrew);
 
-        targetSteering = combined;
+        combined += Steering.Avoidance(this, avoidCrew, combined);
+
+        targetSteering = combined*Steering.GLOBAL_CONTROL_POWER;
 
         currentSteering = SteeringOutput.Lerp(currentSteering, targetSteering, 0.05f);
 
         rb.velocity = currentSteering.linear;
+        rb.angularVelocity = new Vector3(0, Mathf.Clamp(currentSteering.angular, -Steering.MAX_ANGULAR, Steering.MAX_ANGULAR), 0);
 
-        rb.MoveRotation(Quaternion.LookRotation(rb.velocity));
+        //rb.MoveRotation(Quaternion.LookRotation(rb.velocity));
+
+        frontSail.rotation = Quaternion.LookRotation(targetSteering.linear, Vector3.up);
     }
 
     public void AddNearbyShip(Ship ship)
