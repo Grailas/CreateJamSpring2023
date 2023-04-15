@@ -26,6 +26,7 @@ In additon, there is always:
 - Waves
 
 ## Other tasks
+- Spot (man the crows nest, increase vision, spot threats earlier)
 - Fish (gather raw fish)
 - Cook (create rations)
 - Pray (try to appease the gods of the sea and sky)
